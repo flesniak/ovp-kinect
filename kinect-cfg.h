@@ -1,7 +1,7 @@
 #ifndef KINECT_CFG
 #define KINECT_CFG
 
-#define KINECT_DEFAULT_INDEX              "0"
+#define KINECT_DEFAULT_INDEX               0
 
 //PERIPHERAL PARAMETERS
 #define KINECT_REGS_DEFAULT_ADDRESS        0x90000000U
