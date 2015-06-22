@@ -13,37 +13,44 @@
 #define KINECT_VIDEO_BUS_NAME              "VIDEOBUS"
 #define KINECT_DEPTH_BUS_NAME              "DEPTHBUS"
 
-//usually 640x480 pixels 24bpp 0xrrggbb (notation in little endian)
+//usually 640x480 pixels 24bpp 0xrrggbb (in RGB mode, notation in little endian)
+//for other modes (bayer, yuv etc see libfreenect documentation and src/cameras.c)
 #define KINECT_VIDEO_WIDTH                 640 //1280x1024 video mode not implemented
 #define KINECT_VIDEO_HEIGHT                480
+#define KINECT_VIDEO_IR_HEIGHT             488
+#define KINECT_VIDEO_MAX_HEIGHT            KINECT_VIDEO_IR_HEIGHT
 
-#define KINECT_VIDEO_BYTES_PER_PIXEL       3
-#define KINECT_VIDEO_BITS_PER_PIXEL        (KINECT_VIDEO_BYTES_PER_PIXEL*8)
-#define KINECT_VIDEO_SCANLINE_PIXELS       KINECT_VIDEO_WIDTH
-#define KINECT_VIDEO_SCANLINE_BYTES        (KINECT_VIDEO_SCANLINE_PIXELS*KINECT_VIDEO_BYTES_PER_PIXEL)
-#define KINECT_VIDEO_SIZE                  (KINECT_VIDEO_SCANLINE_BYTES*KINECT_VIDEO_HEIGHT)
+#define KINECT_VIDEO_MAX_BYTES_PER_PIXEL   3
+#define KINECT_VIDEO_SCANLINE_BYTES        (KINECT_VIDEO_WIDTH*KINECT_VIDEO_MAX_BYTES_PER_PIXEL)
+#define KINECT_VIDEO_BUFFER_SIZE           (KINECT_VIDEO_SCANLINE_BYTES*KINECT_VIDEO_MAX_HEIGHT)
 #define KINECT_VIDEO_RMASK                 0x00ff0000
 #define KINECT_VIDEO_GMASK                 0x0000ff00
 #define KINECT_VIDEO_BMASK                 0x000000ff
 
+//missing defines for depth buffer size/layout/etc
+#define KINECT_DEPTH_WIDTH                 640
+#define KINECT_DEPTH_HEIGHT                480
+#define KINECT_DEPTH_MAX_BYTES_PER_PIXEL   2
+#define KINECT_DEPTH_BUFFER_SIZE           (KINECT_DEPTH_WIDTH*KINECT_DEPTH_HEIGHT*KINECT_DEPTH_MAX_BYTES_PER_PIXEL)
+
 //format indices from libfreenect, just for reference
-#define KINECT_VIDEO_RGB                   0
-#define KINECT_VIDEO_BAYER                 1
-#define KINECT_VIDEO_IR_8BIT               2
-#define KINECT_VIDEO_IR_10BIT              3
-#define KINECT_VIDEO_IR_10BIT_PACKED       4
-#define KINECT_VIDEO_YUV_RGB               5
-#define KINECT_VIDEO_YUV_RAW               6
+#define KINECT_VIDEO_RGB                   0 //3 bytes per pixel
+#define KINECT_VIDEO_BAYER                 1 //1 byte per pixel
+#define KINECT_VIDEO_IR_8BIT               2 //1 byte per pixel, IR height!
+#define KINECT_VIDEO_IR_10BIT              3 //2 bytes per pixel, IR height!
+#define KINECT_VIDEO_IR_10BIT_PACKED       4 //10/8 bytes per pixel, IR height!
+#define KINECT_VIDEO_YUV_RGB               5 //3 bytes per pixel
+#define KINECT_VIDEO_YUV_RAW               6 //2 bytes per pixel
 #define KINECT_VIDEO_FORMAT_COUNT          7
 
 #define KINECT_VIDEO_DEFAULT_FORMAT        KINECT_VIDEO_RGB
 
-#define KINECT_DEPTH_11BIT                 0
-#define KINECT_DEPTH_10BIT                 1
-#define KINECT_DEPTH_11BIT_PACKED          2
-#define KINECT_DEPTH_10BIT_PACKED          3
-#define KINECT_DEPTH_REGISTERED            4
-#define KINECT_DEPTH_MM                    5
+#define KINECT_DEPTH_11BIT                 0 //2 bytes per pixel
+#define KINECT_DEPTH_10BIT                 1 //2 bytes per pixel
+#define KINECT_DEPTH_11BIT_PACKED          2 //11/8 bytes per pixel
+#define KINECT_DEPTH_10BIT_PACKED          3 //10/8 bytes per pixel
+#define KINECT_DEPTH_REGISTERED            4 //2 bytes per pixel
+#define KINECT_DEPTH_MM                    5 //2 bytes per pixel
 #define KINECT_DEPTH_FORMAT_COUNT          6
 
 #define KINECT_DEPTH_DEFAULT_FORMAT        KINECT_DEPTH_REGISTERED
