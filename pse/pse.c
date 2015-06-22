@@ -9,50 +9,50 @@ typedef _Bool bool;
 static bool bigEndianGuest;
 
 Uns32 initKinect(Uns32 id, Uns32 bigEndianGuest) {
-  bhmMessage("F", "VIN_PSE", "Failed to intercept : initKinect");
+  bhmMessage("F", "KINECT_PSE", "Failed to intercept : initKinect");
   return 0;
 }
 
 void mapMemory(Uns32 video, Uns32 depth) {
-  bhmMessage("F", "VIN_PSE", "Failed to intercept : mapMemory");
+  bhmMessage("F", "KINECT_PSE", "Failed to intercept : mapMemory");
 }
 
 void configure(Uns32 enable, Uns32 videoOn, Uns32 depthOn, Uns32 continuous) {
-  bhmMessage("F", "VIN_PSE", "Failed to intercept : configure");
+  bhmMessage("F", "KINECT_PSE", "Failed to intercept : configure");
 }
 
 //requests a new frame if request==1, in any case returns if the last requested frame is ready
 Uns32 requestFrame(Uns32 request) {
-  bhmMessage("F", "VIN_PSE", "Failed to intercept : requestFrame");
+  bhmMessage("F", "KINECT_PSE", "Failed to intercept : requestFrame");
   return 0;
 }
 
 void setFormats(Uns32 videoFormat, Uns32 depthFormat) {
-  bhmMessage("F", "VIN_PSE", "Failed to intercept : setFormats");
+  bhmMessage("F", "KINECT_PSE", "Failed to intercept : setFormats");
 }
 
 PPM_REG_READ_CB(readReg) {
   Uns32 reg = (Uns32)user;
   switch( reg ) {
     case 0 : //configuration register
-      bhmMessage("D", "VIN_PSE", "Read from CR for %d bytes at 0x%08x", bytes, (Uns32)addr);
+      bhmMessage("D", "KINECT_PSE", "Read from CR for %d bytes at 0x%08x", bytes, (Uns32)addr);
       CFGBUS_AB0_data.CR.value = (CFGBUS_AB0_data.CR.value & ~KINECT_CR_REQUEST_MASK) | (requestFrame(0) << KINECT_CR_REQUEST_OFFSET); //fetch current frame request state from semihost
       return bigEndianGuest ? bswap_32(CFGBUS_AB0_data.CR.value) : CFGBUS_AB0_data.CR.value;
       break;
     case 1 : //video address register
-      bhmMessage("D", "VIN_PSE", "Read from VIDEO_AR for %d bytes at 0x%08x", bytes, (Uns32)addr);
+      bhmMessage("D", "KINECT_PSE", "Read from VIDEO_AR for %d bytes at 0x%08x", bytes, (Uns32)addr);
       return bigEndianGuest ? bswap_32(CFGBUS_AB0_data.VIDEO_AR.value) : CFGBUS_AB0_data.VIDEO_AR.value;
       break;
     case 2 : //depth address register
-      bhmMessage("D", "VIN_PSE", "Read from DEPTH_AR for %d bytes at 0x%08x", bytes, (Uns32)addr);
+      bhmMessage("D", "KINECT_PSE", "Read from DEPTH_AR for %d bytes at 0x%08x", bytes, (Uns32)addr);
       return bigEndianGuest ? bswap_32(CFGBUS_AB0_data.DEPTH_AR.value) : CFGBUS_AB0_data.DEPTH_AR.value;
       break;
     case 3 : //interaction register
-      bhmMessage("D", "VIN_PSE", "Read from FMTREG for %d bytes at 0x%08x", bytes, (Uns32)addr);
+      bhmMessage("D", "KINECT_PSE", "Read from FMTREG for %d bytes at 0x%08x", bytes, (Uns32)addr);
       return bigEndianGuest ? bswap_32(CFGBUS_AB0_data.FMTREG.value) : CFGBUS_AB0_data.FMTREG.value;
       break;
     default:
-      bhmMessage("W", "VIN_PSE", "Invalid user data on readReg\n");
+      bhmMessage("W", "KINECT_PSE", "Invalid user data on readReg\n");
   }
 
   return 0;
@@ -62,7 +62,7 @@ PPM_REG_WRITE_CB(writeReg) {
   Uns32 reg = (Uns32)user;
   switch( reg ) {
     case 0 : //configuration register
-      bhmMessage("D", "VIN_PSE", "Write to CR at 0x%08x data 0x%08x", (Uns32)addr, data);
+      bhmMessage("D", "KINECT_PSE", "Write to CR at 0x%08x data 0x%08x", (Uns32)addr, data);
       Uns32 newdata = bigEndianGuest ? bswap_32(data) : data;
         requestFrame(1); //request a new frame if appropriate bit is set
       newdata &= ~KINECT_CR_REQUEST_MASK; //mask out request bit
@@ -74,33 +74,33 @@ PPM_REG_WRITE_CB(writeReg) {
       CFGBUS_AB0_data.CR.value = newdata; //save settings
       break;
     case 1 : //video address register
-      bhmMessage("D", "VIN_PSE", "Write to VIDEO_AR at 0x%08x data 0x%08x", (Uns32)addr, data);
+      bhmMessage("D", "KINECT_PSE", "Write to VIDEO_AR at 0x%08x data 0x%08x", (Uns32)addr, data);
       Uns32 newvaddr = bigEndianGuest ? bswap_32(data) : data;
       if( newvaddr != CFGBUS_AB0_data.VIDEO_AR.value )
         mapMemory(newvaddr, CFGBUS_AB0_data.DEPTH_AR.value);
       CFGBUS_AB0_data.VIDEO_AR.value = newvaddr;
       break;
     case 2 : //depth address register
-      bhmMessage("D", "VIN_PSE", "Write to DEPTH_AR at 0x%08x data 0x%08x", (Uns32)addr, data);
+      bhmMessage("D", "KINECT_PSE", "Write to DEPTH_AR at 0x%08x data 0x%08x", (Uns32)addr, data);
       Uns32 newdaddr = bigEndianGuest ? bswap_32(data) : data;
       if( newdaddr != CFGBUS_AB0_data.DEPTH_AR.value )
         mapMemory(CFGBUS_AB0_data.VIDEO_AR.value, newdaddr);
       CFGBUS_AB0_data.DEPTH_AR.value = newdaddr;
       break;
     case 3 : //format register
-      bhmMessage("D", "VIN_PSE", "Write to FMTREG at 0x%08x data 0x%08x", (Uns32)addr, data);
+      bhmMessage("D", "KINECT_PSE", "Write to FMTREG at 0x%08x data 0x%08x", (Uns32)addr, data);
       Uns32 newfmts = bigEndianGuest ? bswap_32(data) : data;
       if( newfmts != CFGBUS_AB0_data.FMTREG.value )
         setFormats((newfmts & KINECT_FMTREG_VIDEO_MASK) >> KINECT_FMTREG_VIDEO_OFFSET, (newfmts >> KINECT_FMTREG_DEPTH_OFFSET) & 0xffff0000);
       CFGBUS_AB0_data.FMTREG.value = newfmts;
       break;
     default:
-      bhmMessage("W", "VIN_PSE", "Invalid user data on writeReg\n");
+      bhmMessage("W", "KINECT_PSE", "Invalid user data on writeReg\n");
   }
 }
 
 PPM_CONSTRUCTOR_CB(constructor) {
-  bhmMessage("I", "VIN_PSE", "Constructing");
+  bhmMessage("I", "KINECT_PSE", "Constructing");
   periphConstructor();
 
   bigEndianGuest = bhmBoolAttribute("bigEndianGuest");
@@ -110,13 +110,13 @@ PPM_CONSTRUCTOR_CB(constructor) {
     bhmMessage("W", "TFT_PSE", "Could not read kinectIndex parameter, using default (%d)", KINECT_DEFAULT_INDEX);
   }
 
-  bhmMessage("I", "VIN_PSE", "Initializing Kinect");
+  bhmMessage("I", "KINECT_PSE", "Initializing Kinect");
   Uns32 error = initKinect(kinectIndex, bigEndianGuest); //do byte swapping when guest is big endian
 
   if( !error )
-    bhmMessage("I", "VIN_PSE", "Kinect initialized successfully");
+    bhmMessage("I", "KINECT_PSE", "Kinect initialized successfully");
   else
-    bhmMessage("F", "VIN_PSE", "Failed to initialize Kinect");
+    bhmMessage("F", "KINECT_PSE", "Failed to initialize Kinect");
 
   //initialize registers to reset values
   CFGBUS_AB0_data.CR.value = (0 & KINECT_CR_ENABLED_MASK) << KINECT_CR_ENABLED_OFFSET|
@@ -134,6 +134,6 @@ PPM_CONSTRUCTOR_CB(constructor) {
 }
 
 PPM_DESTRUCTOR_CB(destructor) {
-  bhmMessage("I", "VIN_PSE", "Destructing");
+  bhmMessage("I", "KINECT_PSE", "Destructing");
 }
 

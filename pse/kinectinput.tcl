@@ -1,6 +1,6 @@
 imodelnewperipheral -name kinectinput -vendor itiv.kit.edu -library peripheral -version 1.0 -constructor constructor -destructor destructor
 iadddocumentation   -name Licensing   -text "Open Source Apache 2.0"
-iadddocumentation   -name Description -text "Kinect to OVP video input peripheral"
+iadddocumentation   -name Description -text "Kinect to OVP input peripheral"
 
   imodeladdbusslaveport -name CFGBUS -size 16
   imodeladdaddressblock -name AB0          -width 32     -offset 0 -size 16
@@ -10,7 +10,7 @@ iadddocumentation   -name Description -text "Kinect to OVP video input periphera
     imodeladdfield        -name VIDEO      -bitoffset 1  -width 1  -access rw -mmregister CFGBUS/AB0/CR
       iadddocumentation -name Description  -text "Enable video streaming (default on)"
     imodeladdfield        -name DEPTH      -bitoffset 2  -width 1  -access rw -mmregister CFGBUS/AB0/CR
-      iadddocumentation -name Description  -text "Enable depth streaming (default on)"
+      iadddocumentation -name Description  -text "Enable depth streaming (default off)"
     imodeladdfield        -name CONTINUOUS -bitoffset 3  -width 1  -access rw -mmregister CFGBUS/AB0/CR
       iadddocumentation -name Description  -text "Enable continuous streaming, no frame requests necessary"
     imodeladdfield        -name REQUEST    -bitoffset 31 -width 1 -access rw -mmregister CFGBUS/AB0/CR
@@ -29,8 +29,8 @@ iadddocumentation   -name Description -text "Kinect to OVP video input periphera
 
   imodeladdbusslaveport -name VIDEOBUS -size 0xe1000 -remappable -mustbeconnected
     iadddocumentation -name Description -text "Video memory, sized 640x480x3Byte=921600Byte"
-  imodeladdbusslaveport -name DEPTHBUS -size 0xe1000 -remappable -mustbeconnected
-    iadddocumentation -name Description -text "Video memory, sized 640x480x3Byte=921600Byte"
+  imodeladdbusslaveport -name DEPTHBUS -size 0x96000 -remappable -mustbeconnected
+    iadddocumentation -name Description -text "Depth memory, sized 640x480x2Byte=614400Byte"
 
   imodeladdformal -name "kinectIndex" -type uns32
   imodeladdformal -name "bigEndianGuest" -type bool
