@@ -15,13 +15,13 @@ iadddocumentation   -name Description -text "Kinect to OVP input peripheral"
       iadddocumentation -name Description  -text "Enable continuous streaming, no frame requests necessary"
     imodeladdfield        -name REQUEST    -bitoffset 31 -width 1 -access rw -mmregister CFGBUS/AB0/CR
       iadddocumentation -name Description  -text "Request a new frame (video + depth) (no continuous streaming)"
-  imodeladdmmregister   -name VIDEO_AR     -offset 4     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 0
+  imodeladdmmregister   -name VIDEO_AR     -offset 4     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 1
     imodeladdfield        -name BASEADDR   -bitoffset 0  -width 32 -access rw -mmregister CFGBUS/AB0/VIDEO_AR
       iadddocumentation -name Description  -text "Video framebuffer target address in host memory"
-  imodeladdmmregister   -name DEPTH_AR     -offset 8     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 0
+  imodeladdmmregister   -name DEPTH_AR     -offset 8     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 2
     imodeladdfield        -name BASEADDR   -bitoffset 0  -width 32 -access rw -mmregister CFGBUS/AB0/DEPTH_AR
       iadddocumentation -name Description  -text "Depth framebuffer target address in host memory"
-  imodeladdmmregister   -name FMTREG       -offset 12     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 0
+  imodeladdmmregister   -name FMTREG       -offset 12     -width 32 -access rw -readfunction readReg -writefunction writeReg -userdata 3
     imodeladdfield        -name VIDEOFMT   -bitoffset 0  -width 16 -access rw -mmregister CFGBUS/AB0/FMTREG
       iadddocumentation -name Description  -text "Video format (libfreenect index)"
     imodeladdfield        -name DEPTHFMT   -bitoffset 16 -width 16 -access rw -mmregister CFGBUS/AB0/FMTREG

@@ -11,6 +11,10 @@
 #include "../../xilinx-dvi/dvi-mem.h"
 //needs a xilinx-dvi configured to 1280x480 display size (rgb beneath depth info)
 
+//paths to the peripherals' root folders (containing pse and model folders)
+#define DVI_PATH "../../xilinx-dvi"
+#define KINECT_PATH "../../ovp-kinect"
+
 #define INSTRUCTION_COUNT_DEFAULT 100000
 
 static struct optionsS {
@@ -184,12 +188,12 @@ int main( int argc, char** argv ) {
       icmAddStringAttr(pseAttrs, "output", options.display);
       //icmAddUns32Attr(pseAttrs, "polledRedraw", DVI_REDRAW_PSE);
 
-      icmPseP dvi = icmNewPSE( "dvi", "../../xilinx-dvi/pse/pse.pse", pseAttrs, 0, 0 );
+      icmPseP dvi = icmNewPSE( "dvi", DVI_PATH"/pse/pse.pse", pseAttrs, 0, 0 );
       icmConnectPSEBus( dvi, bus1, DVI_REGS_BUS_NAME, 0, DVI_BASE_ADDRESS, DVI_BASE_ADDRESS+DVI_CONTROL_REGS_SIZE-1 );
       icmConnectPSEBusDynamic( dvi, bus1, DVI_VMEM_BUS_NAME, 0 );
 
       //load semihost library
-      icmAddPseInterceptObject( dvi, "dvi", "../../xilinx-dvi/model/model.so", 0, 0);
+      icmAddPseInterceptObject( dvi, "dvi", DVI_PATH"/model/model.so", 0, 0);
     }
 
     if( options.kinect ) {
@@ -197,13 +201,14 @@ int main( int argc, char** argv ) {
       icmAddBoolAttr(pseAttrs, "bigEndianGuest", 1);
       icmAddUns32Attr(pseAttrs, "kinectIndex", 0);
 
-      icmPseP kinect = icmNewPSE( "kinect", "../pse/pse.pse", pseAttrs, 0, 0 );
+      icmPseP kinect = icmNewPSE( "kinect", KINECT_PATH"/pse/pse.pse", pseAttrs, 0, 0 );
       icmConnectPSEBus( kinect, bus1, KINECT_REGS_BUS_NAME, 0, KINECT_REGS_DEFAULT_ADDRESS, KINECT_REGS_DEFAULT_ADDRESS+KINECT_REGS_SIZE-1);
       icmConnectPSEBusDynamic( kinect, bus1, KINECT_DEPTH_BUS_NAME, 0 );
       icmConnectPSEBusDynamic( kinect, bus1, KINECT_VIDEO_BUS_NAME, 0 );
+      icmSetPSEdiagnosticLevel( kinect, 3 );
 
       //load semihost library
-      icmAddPseInterceptObject( kinect, "kinect", "../model/model.so", 0, 0);
+      icmAddPseInterceptObject( kinect, "kinect", KINECT_PATH"/model/model.so", 0, 0);
     }
   } else if( options.memorySize != UINT_MAX ) {
     icmBusP bus1 = icmNewBus( "bus1", 32 );

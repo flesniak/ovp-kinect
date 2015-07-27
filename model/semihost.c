@@ -86,6 +86,7 @@ void byteswapCopy(void* dst, void* src, int len) {
 
 void callback_video(freenect_device *dev, void *video, uint32_t timestamp) {
   vmiosObjectP object = (vmiosObjectP)freenect_get_user(dev);
+  //vmiMessage("I", "KINECT_SH", "video callback continuous %d videoRequest %d", object->continuous, object->videoRequest);
   if( !object->continuous ) { //in continuous mode, library operates directly on mapped buffer -> no copy necessary
     if( object->videoRequest ) {
       if( object->bigEndianGuest )
@@ -101,6 +102,7 @@ void callback_video(freenect_device *dev, void *video, uint32_t timestamp) {
 
 void callback_depth(freenect_device *dev, void *depth, uint32_t timestamp) {
   vmiosObjectP object = (vmiosObjectP)freenect_get_user(dev);
+  //vmiMessage("I", "KINECT_SH", "depth callback continuous %d videoRequest %d", object->continuous, object->depthRequest);
   if( !object->continuous ) { //in continuous mode, library operates directly on mapped buffer -> no copy necessary
     if( object->depthRequest ) {
       if( object->bigEndianGuest ) //if byte swapping is needed, to copy & swap at once
@@ -136,6 +138,7 @@ static void* streamerThread(void* objectV) {
 }
 
 memDomainP getSimulatedVmemDomain(vmiProcessorP processor, char* name) {
+  vmiMessage("I", "KINECT_SH", "getSimulatedVmemDomain processor %p name %s", processor, name);
   Addr lo, hi;
   Bool isMaster, isDynamic;
   memDomainP simDomain = vmipsePlatformPortAttributes(processor, name, &lo, &hi, &isMaster, &isDynamic);
@@ -213,7 +216,7 @@ static VMIOS_INTERCEPT_FN(configure) {
   GET_ARG(processor, object, index, depthOn);
   GET_ARG(processor, object, index, continuous);
 
-  vmiMessage("I", "KINECT_SH", "Configure enable %d video %d depth %d continuous %d", enable, videoOn, depthOn, continuous);
+  vmiMessage("I", "KINECT_SH", "Configure enable %d video %d (was %d) depth %d, (was %d) continuous %d", enable, videoOn, object->videoOn, depthOn, object->depthOn, continuous);
 
   if( !enable )
     depthOn = videoOn = 0; //disable both streams on disable
@@ -278,8 +281,12 @@ static VMIOS_INTERCEPT_FN(requestFrame) {
   (void)thisPC; (void)context; (void)userData; (void)atOpaqueIntercept;
   Uns32 request = 0, index = 0;
   GET_ARG(processor, object, index, request);
-  if( request )
-    object->videoRequest = object->depthRequest = 1;
+  if( request ) {
+    if( object->videoOn )
+      object->videoRequest= 1;
+    if( object->depthOn )
+      object->depthRequest= 1;
+  }
   retArg(processor, object, object->videoRequest || object->depthRequest);
 }
 
