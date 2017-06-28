@@ -1,0 +1,9 @@
+*.so
+*.o
+obj
+*.exe
+*.elf
+*.pse
+pse/*.igen.*
+contrib/kinect2sdl
+platform/platform
